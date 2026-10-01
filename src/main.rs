@@ -40,12 +40,13 @@ fn game_print(game: &[Vec<u32>]) {
         print!("|");
         for cell in row.iter() {
             if *cell == 0 {
-                print!("____|");
+                print!("    |");
             } else {
-                print!("{:4}|", cell);
+                print!("{:^4}|", cell);
             }
         }
         println!();
+        println!("---------------------");
     }
 }
 
