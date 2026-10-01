@@ -47,6 +47,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34aa73646ffb006b8f5147f3dc182bd4bcb190227ce861fc4a4844bf8e3cb2c0"
 
 [[package]]
+name = "game_2048"
+version = "0.1.0"
+dependencies = [
+ "console",
+ "rand",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -86,14 +94,6 @@ name = "rand_core"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
-
-[[package]]
-name = "twozerofoureight"
-version = "0.1.0"
-dependencies = [
- "console",
- "rand",
-]
 
 [[package]]
 name = "unicode-width"
