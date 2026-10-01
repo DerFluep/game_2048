@@ -4,7 +4,7 @@ use console::{
 };
 use rand::prelude::*;
 
-fn spawn_numbers(count: usize, game: &mut [Vec<u32>]) -> bool {
+fn game_spawn(count: usize, game: &mut [Vec<u32>]) -> bool {
     let mut rnd = rand::rng();
     let mut counter = 0;
 
@@ -34,7 +34,7 @@ fn spawn_numbers(count: usize, game: &mut [Vec<u32>]) -> bool {
     true
 }
 
-fn print_game(game: &[Vec<u32>]) {
+fn game_print(game: &[Vec<u32>]) {
     for row in game.iter() {
         for cell in row.iter() {
             if *cell == 0 {
@@ -49,7 +49,7 @@ fn print_game(game: &[Vec<u32>]) {
 
 // FIXME: change to two step togic: first move all, then merge, then move again
 // FIXME: Only spawn a number if anything moved within a move
-fn move_game(game: &mut [Vec<u32>], key: Key) -> bool {
+fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
     match key {
         ArrowDown => {
             // go through every column
@@ -70,7 +70,7 @@ fn move_game(game: &mut [Vec<u32>], key: Key) -> bool {
                     }
                 }
             }
-            spawn_numbers(1, game)
+            game_spawn(1, game)
         }
         ArrowUp => {
             // go through every column
@@ -93,7 +93,7 @@ fn move_game(game: &mut [Vec<u32>], key: Key) -> bool {
                     }
                 }
             }
-            spawn_numbers(1, game)
+            game_spawn(1, game)
         }
         ArrowLeft => {
             for row in 0..game.len() {
@@ -111,7 +111,7 @@ fn move_game(game: &mut [Vec<u32>], key: Key) -> bool {
                     }
                 }
             }
-            spawn_numbers(1, game)
+            game_spawn(1, game)
         }
         ArrowRight => {
             for row in 0..game.len() {
@@ -129,13 +129,13 @@ fn move_game(game: &mut [Vec<u32>], key: Key) -> bool {
                     }
                 }
             }
-            spawn_numbers(1, game)
+            game_spawn(1, game)
         }
         _ => false,
     }
 }
 
-fn check_if_won(game: &[Vec<u32>]) -> bool {
+fn game_check_won(game: &[Vec<u32>]) -> bool {
     for row in game.iter() {
         for cell in row.iter() {
             if *cell == 2048 {
@@ -150,10 +150,10 @@ fn main() {
     let term = Term::stdout();
 
     let mut game = vec![vec![0; 4]; 4];
-    spawn_numbers(2, &mut game);
+    game_spawn(2, &mut game);
 
     term.clear_screen().unwrap();
-    print_game(&game);
+    game_print(&game);
 
     let lost;
 
@@ -161,15 +161,15 @@ fn main() {
         match term.read_key() {
             Err(e) => println!("{}", e),
             Ok(key) => {
-                if !move_game(&mut game, key) {
+                if !game_move(&mut game, key) {
                     lost = true;
                     break;
                 }
             }
         };
         term.clear_screen().unwrap();
-        print_game(&game);
-        if check_if_won(&game) {
+        game_print(&game);
+        if game_check_won(&game) {
             lost = false;
             break;
         }
