@@ -52,6 +52,7 @@ fn game_print(game: &[Vec<u32>]) {
 
 // FIXME: Only spawn a number if anything moved within a move
 fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
+    let before = game.to_vec();
     match key {
         ArrowDown => {
             for column in 0..game[0].len() {
@@ -94,7 +95,6 @@ fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
                     game[n][column] = list[n];
                 }
             }
-            game_spawn(1, game)
         }
         ArrowUp => {
             for column in 0..game[0].len() {
@@ -137,7 +137,6 @@ fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
                     game[n][column] = list[n];
                 }
             }
-            game_spawn(1, game)
         }
         ArrowLeft => {
             for row in game.iter_mut() {
@@ -168,7 +167,6 @@ fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
                 // update game
                 row[..list.len()].copy_from_slice(&list[..]);
             }
-            game_spawn(1, game)
         }
         ArrowRight => {
             for row in game.iter_mut() {
@@ -209,9 +207,13 @@ fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
                 // update game
                 row[..list.len()].copy_from_slice(&list[..]);
             }
-            game_spawn(1, game)
         }
-        _ => false,
+        _ => {}
+    }
+    if before != game {
+        game_spawn(1, game)
+    } else {
+        false
     }
 }
 
