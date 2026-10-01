@@ -247,7 +247,6 @@ fn game_check_lost(game: &[Vec<u32>]) -> bool {
     is_lost
 }
 
-// TODO: New lost logic
 fn main() {
     let term = Term::stdout();
 
