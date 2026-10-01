@@ -35,7 +35,9 @@ fn game_spawn(count: usize, game: &mut [Vec<u32>]) -> bool {
 }
 
 fn game_print(game: &[Vec<u32>]) {
+    println!("_____________________");
     for row in game.iter() {
+        print!("|");
         for cell in row.iter() {
             if *cell == 0 {
                 print!("____|");
