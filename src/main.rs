@@ -4,22 +4,9 @@ use console::{
 };
 use rand::prelude::*;
 
-fn game_spawn(count: usize, game: &mut [Vec<u32>]) -> bool {
+fn game_spawn(count: usize, game: &mut [Vec<u32>]) {
     let mut rnd = rand::rng();
     let mut counter = 0;
-
-    let mut is_full = true;
-    for row in game.iter() {
-        for cell in row.iter() {
-            if *cell == 0 {
-                is_full = false;
-            }
-        }
-    }
-
-    if is_full {
-        return false;
-    }
 
     while counter < count {
         for row in game.iter_mut() {
@@ -31,7 +18,6 @@ fn game_spawn(count: usize, game: &mut [Vec<u32>]) -> bool {
             }
         }
     }
-    true
 }
 
 fn game_print(game: &[Vec<u32>]) {
@@ -50,8 +36,9 @@ fn game_print(game: &[Vec<u32>]) {
     }
 }
 
-// FIXME: Only spawn a number if anything moved within a move
-fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
+// TODO: Use filter to get rid of all zeros -> automatically moves everything to one side. Then
+// resize with zeros
+fn game_move(game: &mut [Vec<u32>], key: Key) {
     let before = game.to_vec();
     match key {
         ArrowDown => {
@@ -210,10 +197,9 @@ fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
         }
         _ => {}
     }
+
     if before != game {
-        game_spawn(1, game)
-    } else {
-        false
+        game_spawn(1, game);
     }
 }
 
@@ -228,6 +214,7 @@ fn game_check_won(game: &[Vec<u32>]) -> bool {
     false
 }
 
+// TODO: New lost logic
 fn main() {
     let term = Term::stdout();
 
@@ -237,22 +224,18 @@ fn main() {
     term.clear_screen().unwrap();
     game_print(&game);
 
-    let lost;
+    let lost = false;
 
     loop {
         match term.read_key() {
             Err(e) => println!("{}", e),
-            Ok(key) => {
-                if !game_move(&mut game, key) {
-                    lost = true;
-                    break;
-                }
-            }
+            Ok(key) => game_move(&mut game, key),
         };
+
         term.clear_screen().unwrap();
         game_print(&game);
+
         if game_check_won(&game) {
-            lost = false;
             break;
         }
     }
