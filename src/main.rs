@@ -47,87 +47,164 @@ fn game_print(game: &[Vec<u32>]) {
     }
 }
 
-// FIXME: change to two step togic: first move all, then merge, then move again
 // FIXME: Only spawn a number if anything moved within a move
 fn game_move(game: &mut [Vec<u32>], key: Key) -> bool {
     match key {
         ArrowDown => {
-            // go through every column
             for column in 0..game[0].len() {
-                // repeat 4 times
-                for _ in 0..game.len() {
-                    // go up the rows, starting at the second last one
-                    for n in (0..game.len() - 1).rev() {
-                        // check if a cell is bigger than 0 and if the cell below is empty
-                        if game[n][column] > 0 && game[n + 1][column] == 0 {
-                            game[n + 1][column] = game[n][column];
-                            game[n][column] = 0;
-                        // check if the cell below has the same value as the current cell and merge
-                        } else if game[n][column] > 0 && game[n + 1][column] == game[n][column] {
-                            game[n + 1][column] *= 2;
-                            game[n][column] = 0;
+                // store column in new vector
+                let mut list = Vec::new();
+                for row in game.iter() {
+                    list.push(row[column]);
+                }
+
+                // move everything down
+                for _ in 0..list.len() {
+                    for n in (0..list.len() - 1).rev() {
+                        if list[n] > 0 && list[n + 1] == 0 {
+                            list[n + 1] = list[n];
+                            list[n] = 0;
                         }
                     }
+                }
+
+                // merge
+                for n in (1..list.len()).rev() {
+                    if list[n] == list[n - 1] {
+                        list[n] *= 2;
+                        list[n - 1] = 0;
+                    }
+                }
+
+                // move everything down
+                for _ in 0..list.len() {
+                    for n in (0..list.len() - 1).rev() {
+                        if list[n] > 0 && list[n + 1] == 0 {
+                            list[n + 1] = list[n];
+                            list[n] = 0;
+                        }
+                    }
+                }
+
+                // update game
+                for n in 0..list.len() {
+                    game[n][column] = list[n];
                 }
             }
             game_spawn(1, game)
         }
         ArrowUp => {
-            // go through every column
             for column in 0..game[0].len() {
-                // repeat 4 times
-                for _ in 0..game.len() {
-                    // go down the rows, starting at the second row
-                    for row in 1..game.len() {
-                        // check if the cell is bigger than 0 and if the cell above is empty
-                        if game[row][column] > 0 && game[row - 1][column] == 0 {
-                            game[row - 1][column] = game[row][column];
-                            game[row][column] = 0;
-                        // check if the cell above has the same calue as the current cell and merge
-                        } else if game[row][column] > 0
-                            && game[row - 1][column] == game[row][column]
-                        {
-                            game[row - 1][column] *= 2;
-                            game[row][column] = 0;
+                // store column in new vector
+                let mut list = Vec::new();
+                for row in game.iter() {
+                    list.push(row[column]);
+                }
+
+                // move everything up
+                for _ in 0..list.len() {
+                    for n in 1..list.len() {
+                        if list[n] > 0 && list[n - 1] == 0 {
+                            list[n - 1] = list[n];
+                            list[n] = 0;
                         }
                     }
+                }
+
+                // merge
+                for n in 0..list.len() - 1 {
+                    if list[n] == list[n + 1] {
+                        list[n] *= 2;
+                        list[n + 1] = 0;
+                    }
+                }
+
+                // move everything up
+                for _ in 0..list.len() {
+                    for n in 1..list.len() {
+                        if list[n] > 0 && list[n - 1] == 0 {
+                            list[n - 1] = list[n];
+                            list[n] = 0;
+                        }
+                    }
+                }
+
+                // update game
+                for n in 0..list.len() {
+                    game[n][column] = list[n];
                 }
             }
             game_spawn(1, game)
         }
         ArrowLeft => {
-            for row in 0..game.len() {
-                for _ in 0..game.len() {
-                    for column in 1..game[0].len() {
-                        if game[row][column] > 0 && game[row][column - 1] == 0 {
-                            game[row][column - 1] = game[row][column];
-                            game[row][column] = 0;
-                        } else if game[row][column] > 0
-                            && game[row][column - 1] == game[row][column]
-                        {
-                            game[row][column - 1] *= 2;
-                            game[row][column] = 0;
+            for row in game.iter_mut() {
+                // store row in new vector
+                let mut list = Vec::new();
+                for column in row.iter() {
+                    list.push(*column);
+                }
+
+                // move everything left
+                for _ in 0..list.len() {
+                    for n in 1..list.len() {
+                        if list[n] > 0 && list[n - 1] == 0 {
+                            list[n - 1] = list[n];
+                            list[n] = 0;
                         }
                     }
                 }
+
+                // merge
+                for n in 0..list.len() - 1 {
+                    if list[n] == list[n + 1] {
+                        list[n] *= 2;
+                        list[n + 1] = 0;
+                    }
+                }
+
+                // update game
+                row[..list.len()].copy_from_slice(&list[..]);
             }
             game_spawn(1, game)
         }
         ArrowRight => {
-            for row in 0..game.len() {
-                for _ in 0..game.len() {
-                    for column in (0..game[0].len() - 1).rev() {
-                        if game[row][column] > 0 && game[row][column + 1] == 0 {
-                            game[row][column + 1] = game[row][column];
-                            game[row][column] = 0;
-                        } else if game[row][column] > 0
-                            && game[row][column + 1] == game[row][column]
-                        {
-                            game[row][column + 1] *= 2;
-                            game[row][column] = 0;
+            for row in game.iter_mut() {
+                // store row in new vector
+                let mut list = Vec::new();
+                for column in row.iter() {
+                    list.push(*column);
+                }
+
+                // move everything right
+                for _ in 0..list.len() {
+                    for n in (0..list.len() - 1).rev() {
+                        if list[n] > 0 && list[n + 1] == 0 {
+                            list[n + 1] = list[n];
+                            list[n] = 0;
                         }
                     }
                 }
+
+                // merge
+                for n in (1..list.len()).rev() {
+                    if list[n] == list[n - 1] {
+                        list[n] *= 2;
+                        list[n - 1] = 0;
+                    }
+                }
+
+                // move everything right
+                for _ in 0..list.len() {
+                    for n in (0..list.len() - 1).rev() {
+                        if list[n] > 0 && list[n + 1] == 0 {
+                            list[n + 1] = list[n];
+                            list[n] = 0;
+                        }
+                    }
+                }
+
+                // update game
+                row[..list.len()].copy_from_slice(&list[..]);
             }
             game_spawn(1, game)
         }
