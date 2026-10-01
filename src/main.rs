@@ -214,6 +214,39 @@ fn game_check_won(game: &[Vec<u32>]) -> bool {
     false
 }
 
+fn game_check_lost(game: &[Vec<u32>]) -> bool {
+    let mut is_lost = true;
+    for row in game.iter() {
+        for cell in row.iter() {
+            if *cell == 0 {
+                is_lost = false;
+            }
+        }
+    }
+
+    for row in game.iter() {
+        for n in 0..row.len() - 1 {
+            if row[n] == row[n + 1] {
+                is_lost = false;
+            }
+        }
+    }
+
+    for column in 0..game[0].len() {
+        let mut list = Vec::new();
+        for row in game.iter() {
+            list.push(row[column]);
+        }
+
+        for n in 0..list.len() - 1 {
+            if list[n] == list[n + 1] {
+                is_lost = false;
+            }
+        }
+    }
+    is_lost
+}
+
 // TODO: New lost logic
 fn main() {
     let term = Term::stdout();
@@ -223,8 +256,6 @@ fn main() {
 
     term.clear_screen().unwrap();
     game_print(&game);
-
-    let lost = false;
 
     loop {
         match term.read_key() {
@@ -236,12 +267,11 @@ fn main() {
         game_print(&game);
 
         if game_check_won(&game) {
+            println!("Du krasser oberficker hast gewonnen!");
+            break;
+        } else if game_check_lost(&game) {
+            println!("BWAHAHAHA nooooob");
             break;
         }
-    }
-    if lost {
-        println!("BWAHAHAHA nooooob");
-    } else {
-        println!("Du krasser oberficker hast gewonnen!");
     }
 }
