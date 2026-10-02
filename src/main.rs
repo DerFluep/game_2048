@@ -1,5 +1,5 @@
 use console::{
-    Key::{self, ArrowDown, ArrowLeft, ArrowRight, ArrowUp},
+    Key::{self, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Escape},
     Term,
 };
 use rand::prelude::*;
@@ -189,7 +189,13 @@ fn main() {
     loop {
         match term.read_key() {
             Err(e) => println!("{}", e),
-            Ok(key) => game_move(&mut game, key),
+            Ok(key) => {
+                if key == Escape {
+                    break;
+                } else {
+                    game_move(&mut game, key)
+                }
+            }
         };
 
         term.clear_screen().unwrap();
