@@ -77,9 +77,6 @@ fn game_move(game: &mut [Vec<u32>], key: Key) {
                 process_list(&mut list);
                 list.reverse();
 
-                for (n, cell) in list.iter().rev().enumerate() {
-                    game[n][column] = *cell;
-                }
                 for n in 0..list.len() {
                     game[n][column] = list[n];
                 }
