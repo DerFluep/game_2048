@@ -21,19 +21,22 @@ fn game_spawn(count: usize, game: &mut [Vec<u32>]) {
 }
 
 fn game_print(game: &[Vec<u32>]) {
-    println!("_____________________");
-    for row in game.iter() {
-        print!("|");
+    println!("┌────┬────┬────┬────┐");
+    for (n, row) in game.iter().enumerate() {
+        print!("│");
         for cell in row.iter() {
             if *cell == 0 {
-                print!("    |");
+                print!("    │");
             } else {
-                print!("{:^4}|", cell);
+                print!("{:^4}│", cell);
             }
         }
         println!();
-        println!("---------------------");
+        if n != game.len() - 1 {
+            println!("├────┼────┼────┼────┤");
+        }
     }
+    println!("└────┴────┴────┴────┘");
 }
 
 fn process_list(list: &mut Vec<u32>) {
@@ -74,6 +77,9 @@ fn game_move(game: &mut [Vec<u32>], key: Key) {
                 process_list(&mut list);
                 list.reverse();
 
+                for (n, cell) in list.iter().rev().enumerate() {
+                    game[n][column] = *cell;
+                }
                 for n in 0..list.len() {
                     game[n][column] = list[n];
                 }
