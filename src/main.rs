@@ -36,8 +36,30 @@ fn game_print(game: &[Vec<u32>]) {
     }
 }
 
-// TODO: Use filter to get rid of all zeros -> automatically moves everything to one side. Then
-// resize with zeros
+fn process_list(list: &mut Vec<u32>) {
+    let list_len = list.len();
+    // clear zeros
+    list.retain(|&x| x != 0);
+
+    // merge
+    let mut result = Vec::new();
+    let mut i = 0;
+    while i < list.len() {
+        if i + 1 < list.len() && list[i] == list[i + 1] {
+            result.push(list[i] * 2);
+            i += 2; // skip the merged entry
+        } else {
+            result.push(list[i]);
+            i += 1;
+        }
+    }
+
+    // fill with zeros
+    result.resize(list_len, 0);
+
+    *list = result;
+}
+
 fn game_move(game: &mut [Vec<u32>], key: Key) {
     let before = game.to_vec();
     match key {
@@ -45,39 +67,13 @@ fn game_move(game: &mut [Vec<u32>], key: Key) {
             for column in 0..game[0].len() {
                 // store column in new vector
                 let mut list = Vec::new();
-                for row in game.iter() {
+                for row in game.iter().rev() {
                     list.push(row[column]);
                 }
 
-                // move everything down
-                for _ in 0..list.len() {
-                    for n in (0..list.len() - 1).rev() {
-                        if list[n] > 0 && list[n + 1] == 0 {
-                            list[n + 1] = list[n];
-                            list[n] = 0;
-                        }
-                    }
-                }
+                process_list(&mut list);
+                list.reverse();
 
-                // merge
-                for n in (1..list.len()).rev() {
-                    if list[n] == list[n - 1] {
-                        list[n] *= 2;
-                        list[n - 1] = 0;
-                    }
-                }
-
-                // move everything down
-                for _ in 0..list.len() {
-                    for n in (0..list.len() - 1).rev() {
-                        if list[n] > 0 && list[n + 1] == 0 {
-                            list[n + 1] = list[n];
-                            list[n] = 0;
-                        }
-                    }
-                }
-
-                // update game
                 for n in 0..list.len() {
                     game[n][column] = list[n];
                 }
@@ -91,33 +87,7 @@ fn game_move(game: &mut [Vec<u32>], key: Key) {
                     list.push(row[column]);
                 }
 
-                // move everything up
-                for _ in 0..list.len() {
-                    for n in 1..list.len() {
-                        if list[n] > 0 && list[n - 1] == 0 {
-                            list[n - 1] = list[n];
-                            list[n] = 0;
-                        }
-                    }
-                }
-
-                // merge
-                for n in 0..list.len() - 1 {
-                    if list[n] == list[n + 1] {
-                        list[n] *= 2;
-                        list[n + 1] = 0;
-                    }
-                }
-
-                // move everything up
-                for _ in 0..list.len() {
-                    for n in 1..list.len() {
-                        if list[n] > 0 && list[n - 1] == 0 {
-                            list[n - 1] = list[n];
-                            list[n] = 0;
-                        }
-                    }
-                }
+                process_list(&mut list);
 
                 // update game
                 for n in 0..list.len() {
@@ -133,66 +103,23 @@ fn game_move(game: &mut [Vec<u32>], key: Key) {
                     list.push(*column);
                 }
 
-                // move everything left
-                for _ in 0..list.len() {
-                    for n in 1..list.len() {
-                        if list[n] > 0 && list[n - 1] == 0 {
-                            list[n - 1] = list[n];
-                            list[n] = 0;
-                        }
-                    }
-                }
-
-                // merge
-                for n in 0..list.len() - 1 {
-                    if list[n] == list[n + 1] {
-                        list[n] *= 2;
-                        list[n + 1] = 0;
-                    }
-                }
+                process_list(&mut list);
 
                 // update game
-                row[..list.len()].copy_from_slice(&list[..]);
+                *row = list;
             }
         }
         ArrowRight => {
             for row in game.iter_mut() {
                 // store row in new vector
-                let mut list = Vec::new();
-                for column in row.iter() {
-                    list.push(*column);
-                }
+                let mut list = row.to_vec();
+                list.reverse();
 
-                // move everything right
-                for _ in 0..list.len() {
-                    for n in (0..list.len() - 1).rev() {
-                        if list[n] > 0 && list[n + 1] == 0 {
-                            list[n + 1] = list[n];
-                            list[n] = 0;
-                        }
-                    }
-                }
-
-                // merge
-                for n in (1..list.len()).rev() {
-                    if list[n] == list[n - 1] {
-                        list[n] *= 2;
-                        list[n - 1] = 0;
-                    }
-                }
-
-                // move everything right
-                for _ in 0..list.len() {
-                    for n in (0..list.len() - 1).rev() {
-                        if list[n] > 0 && list[n + 1] == 0 {
-                            list[n + 1] = list[n];
-                            list[n] = 0;
-                        }
-                    }
-                }
+                process_list(&mut list);
+                list.reverse();
 
                 // update game
-                row[..list.len()].copy_from_slice(&list[..]);
+                *row = list;
             }
         }
         _ => {}
